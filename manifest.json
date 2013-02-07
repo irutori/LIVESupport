@@ -1,0 +1,25 @@
+{
+	"name": "LIVE support",
+	"version": "1.0",
+	"manifest_version": 2,
+	"description": "LIVE support",
+	"options_page": "options.html",
+	"background": {
+		"page": "background.html"
+	},
+	"browser_action": {
+		"default_icon": "icon.gif"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"http://sp.pf.mbga.jp/12008305/*"
+			],
+			"js": [
+				"jquery.min.js",
+				"contentScript.js"
+			],
+			"run_at": "document_end"
+		}
+	]
+}
