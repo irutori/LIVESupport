@@ -10,8 +10,7 @@ chrome.extension.onConnect.addListener(function(port){
 		if(msg.html){
 			var str = msg.html;
 			var txt = checkDisplacement(parseInt(str.match(/[0-9]+/g)[4],10));
-			chrome.browserAction.setBadgeText({text:"+"+txt});
-			console.log("+"+txt);
+			setBadge(txt);
 		}else{
 		checkpattern(msg.pageurl);
 		}
@@ -34,17 +33,18 @@ function checkpattern(url){
 		myport.postMessage({stat: "select"});
 	}else if(url.match("battle%2Fflash")){
 		myport.postMessage({stat: "return"});
+	}else if(url.match("battle_error")){
+		goNext();
+		saveTop();
+		myport.postMessage({stat: "return"});
 	}
-	
 }
 
 function getID(){
 	if(count == 3){
-		count = 0;
-		saveCount();
-		dojoTop++;
-		saveTop();
+		goNext();
 	}
+	saveTop();
 	return dojoId[dojoTop];
 }
 
@@ -58,7 +58,7 @@ function getCount(){
 	return parseInt(temp,10);
 }
 
-function savaTop(){
+function saveTop(){
 	localStorage["dojo_top"] = ""+dojoTop;
 }
 
@@ -70,4 +70,20 @@ function checkDisplacement(now){
 	var disp = now-pre;
 	pre = now;
 	return disp;
+}
+
+function setBadge(txt){
+	console.log("+"+txt);
+	if(txt > 0){
+		txt = "+"+txt
+	}else{
+		txt = "";
+	}
+	chrome.browserAction.setBadgeText({text: txt});
+}
+
+function goNext(){
+	count = 0;
+	saveCount();
+	dojoTop++;
 }
