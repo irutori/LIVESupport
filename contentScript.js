@@ -1,17 +1,18 @@
 var url = location.href;
-count = 0;
+stat = "";
 
 var port = chrome.extension.connect({name: "connect"});
 port.postMessage({pageurl: url});
 
 port.onMessage.addListener(function(msg) {
+	stat = msg.stat;
 	if(msg.stat == "go"){
 		jump(msg.id);
-	}else if(msg.stat == "select"){
-		waitpush(2000);
+	}else if(msg.stat == "select"){	
+		delay(1000);
 	}else if(msg.stat == "return"){
-		waitmypage(2000);
-	}else if(msg.stat =="retFun"){
+		delay(2000);
+	}else if(msg.stat == "retFun"){
 		retFun();
 	}
 });
@@ -28,31 +29,23 @@ function toMypage(){
 	location.href="http://sp.pf.mbga.jp/12008305/?guid=ON&url=http%3A%2F%2F125.6.169.35%2Fidolmaster%2Fmypage";
 }
 
-function waitpush(time){
-	setInterval("stay()",time);
+function delay(time){
+	setTimeout("callMethod()",time);
 }
 
-function stay(){
-	if(count == 0){
-		count++;
-	}else if(count == 1){
+function callMethod(){
+	if(stat == "select"){
 		push();
-	}
-}
-
-function waitmypage(time){
-	setInterval("staymypage()",time);
-}
-
-function staymypage(){
-	if(count == 0){
-		count++;
-	}else if(count == 1){
+	}else if(stat == "return"){
 		toMypage();
+	}else if(stat == "request"){
+		port.postMessage({req: "request"});
 	}
 }
 
 function retFun(){
 	var dom = $(".statusArea")[0].innerText;
 	port.postMessage({html: dom});
+	stat = "request";
+	delay(300000);
 }

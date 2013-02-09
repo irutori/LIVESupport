@@ -4,23 +4,35 @@ var dojoTop = getDojo_top();
 var count = getCount();
 var pre = 0;
 
+var flag = false;
+
 chrome.extension.onConnect.addListener(function(port){
 	port.onMessage.addListener(function(msg){
 		myport = port;
-		if(msg.html){
-			var str = msg.html;
-			var txt = checkDisplacement(parseInt(str.match(/[0-9]+/g)[4],10));
-			setBadge(txt);
-		}else{
-		checkpattern(msg.pageurl);
+		if(flag){
+			if(msg.html){
+				var fun = (msg.html).match(/[0-9]+/g)[4];
+				var funNum = checkDisplacement(parseInt(fun,10));
+				setBadge(funNum);
+			}else if(msg.req){
+				var id = getID();
+				myport.postMessage({stat: "go",id: id});
+			}else{
+			checkpattern(msg.pageurl);
+			}
 		}
 	});
 });
 
 chrome.browserAction.onClicked.addListener(function(tab){
-	var id = getID();
-	//console.log(""+id);
-	myport.postMessage({stat: "go",id: id});
+	if(flag){
+		flag = false;
+	}else{
+		flag = true;
+		var id = getID();
+		myport.postMessage({stat: "go",id: id});
+	}
+	
 });
 
 function checkpattern(url){
